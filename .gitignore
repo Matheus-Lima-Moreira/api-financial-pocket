@@ -1,0 +1,5 @@
+.env
+
+# Golang
+bin/
+vendor/
