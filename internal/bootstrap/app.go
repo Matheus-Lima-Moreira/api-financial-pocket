@@ -41,7 +41,7 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 	authRepository := auth.NewGormRepository(db)
-	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
+	jwtManager := auth.NewJWTManager(cfg.AccessTokenSecret, cfg.RefreshTokenSecret)
 	authService := auth.NewService(authRepository, jwtManager)
 	authHandler := auth.NewHandler(authService)
 
@@ -49,7 +49,8 @@ func NewApp() (*App, error) {
 	router := server.NewRouter(server.Dependencies{
 		Logger:      logger,
 		AuthHandler: authHandler,
-		JWTSecret:   cfg.JWTSecret,
+		JWTManager:  jwtManager,
+		Config:      cfg,
 	})
 
 	return &App{

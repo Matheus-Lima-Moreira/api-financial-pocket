@@ -7,4 +7,5 @@ func RegisterRoutes(router *gin.Engine, handler *Handler) {
 
 	group.POST("/register", handler.Register)
 	group.POST("/login", handler.Login)
+	group.POST("/refresh", handler.Refresh)
 }

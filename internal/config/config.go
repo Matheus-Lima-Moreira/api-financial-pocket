@@ -3,23 +3,31 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
 
 type Config struct {
+	Env        string
 	Port       string
 	DBUser     string
 	DBPassword string
 	DBHost     string
 	DBPort     string
 	DBName     string
-	JWTSecret  string
+	AccessTokenSecret  string
+	RefreshTokenSecret string
 }
 
 func Load() *Config {
 	if os.Getenv("ENV") != "production" {
 		_ = godotenv.Load()
+	}
+
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "development"
 	}
 
 	port := os.Getenv("PORT")
@@ -52,20 +60,53 @@ func Load() *Config {
 		dbName = "financial_pocket"
 	}
 
-	jwtSecret := os.Getenv("JWT_SECRET")
-	if jwtSecret == "" {
-		jwtSecret = "secret"
+	accessTokenSecret := os.Getenv("ACCESS_TOKEN_SECRET")
+	if accessTokenSecret == "" {
+		accessTokenSecret = "secret"
+	}
+	
+	refreshTokenSecret := os.Getenv("REFRESH_TOKEN_SECRET")
+	if refreshTokenSecret == "" {
+		refreshTokenSecret = "secret"
 	}
 
 	return &Config{
+		Env:        env,
 		Port:       port,
 		DBUser:     dbUser,
 		DBPassword: dbPassword,
 		DBHost:     dbHost,
 		DBPort:     dbPort,
 		DBName:     dbName,
-		JWTSecret:  jwtSecret,
+		AccessTokenSecret:  accessTokenSecret,
+		RefreshTokenSecret: refreshTokenSecret,
 	}
+}
+
+func (c *Config) TrustedProxies() []string {
+	if c.Env == "development" {
+		return []string{"127.0.0.1", "::1"}
+	}
+
+	trustedProxies := os.Getenv("TRUSTED_PROXIES")
+	if trustedProxies == "" {
+		return nil
+	}
+
+	proxies := strings.Split(trustedProxies, ",")
+	result := make([]string, 0, len(proxies))
+	for _, proxy := range proxies {
+		trimmed := strings.TrimSpace(proxy)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+
+	if len(result) == 0 {
+		return nil
+	}
+
+	return result
 }
 
 func (c *Config) DSN() string {

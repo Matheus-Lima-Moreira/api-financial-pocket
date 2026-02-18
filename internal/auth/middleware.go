@@ -5,10 +5,9 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 )
 
-func AuthMiddleware(secret string) gin.HandlerFunc {
+func AuthMiddleware(jwtManager *JWTManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
@@ -21,15 +20,28 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
-		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-			return []byte(secret), nil
-		})
+		claims, err := jwtManager.ValidateToken(tokenStr)
+		if err != nil {
+			statusCode := http.StatusUnauthorized
+			if err == ErrExpiredToken {
+				statusCode = http.StatusUnauthorized
+			}
+			c.AbortWithStatusJSON(statusCode, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 
-		if err != nil || !token.Valid {
+		tokenType, ok := claims["type"].(string)
+		if !ok || tokenType != "access" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": ErrInvalidToken.Error(),
 			})
 			return
+		}
+
+		if userID, ok := claims["user_id"].(string); ok {
+			c.Set("user_id", userID)
 		}
 
 		c.Next()

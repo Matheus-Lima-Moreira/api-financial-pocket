@@ -8,4 +8,5 @@ var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrMissingToken       = errors.New("missing token")
 	ErrInvalidToken       = errors.New("invalid token")
+	ErrExpiredToken       = errors.New("token expired")
 )

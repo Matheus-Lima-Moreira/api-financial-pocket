@@ -43,13 +43,32 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	token, err := h.service.Login(c.Request.Context(), input.Email, input.Password)
+	tokens, err := h.service.Login(c.Request.Context(), input.Email, input.Password)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"token": token,
-	})
+	c.JSON(http.StatusOK, tokens)
+}
+
+type refreshInput struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
+
+func (h *Handler) Refresh(c *gin.Context) {
+	var input refreshInput
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.Error(err)
+		return
+	}
+
+	tokens, err := h.service.RefreshToken(c.Request.Context(), input.RefreshToken)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, tokens)
 }
