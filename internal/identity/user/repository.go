@@ -11,4 +11,5 @@ type Repository interface {
 	Create(ctx context.Context, user *UserEntity) *shared_errors.AppError
 	FindByEmail(ctx context.Context, email string) (*UserEntity, *shared_errors.AppError)
 	List(ctx context.Context, page int) ([]UserEntity, *dtos.PaginationDTO, *shared_errors.AppError)
+	GetById(ctx context.Context, id uint) (*UserEntity, *shared_errors.AppError)
 }

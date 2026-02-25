@@ -115,3 +115,20 @@ func (r *GormRepository) List(ctx context.Context, page int) ([]UserEntity, *dto
 
 	return domains, pagination, nil
 }
+
+func (r *GormRepository) GetById(ctx context.Context, id uint) (*UserEntity, *shared_errors.AppError) {
+	var model UserSchema
+
+	err := r.db.WithContext(ctx).
+		Where("id = ?", id).
+		First(&model).Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, shared_errors.NewNotFound("user")
+		}
+		return nil, shared_errors.NewBadRequest(err.Error())
+	}
+
+	return toDomain(&model), nil
+}

@@ -24,6 +24,10 @@ type listInput struct {
 	Page int `form:"page" binding:"required,min=1"`
 }
 
+type detailsInput struct {
+	ID uint `uri:"id" binding:"required,min=1"`
+}
+
 func (h *Handler) Register(c *gin.Context) {
 	var input registerInput
 
@@ -38,7 +42,7 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dtos.ReplyDTO{
-		Message: "user created successfully",
+		Message: "user.created",
 		Data:    nil,
 	})
 }
@@ -59,6 +63,25 @@ func (h *Handler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
 		Data:       users,
 		Pagination: pagination,
-		Message:    "users listed successfully",
+		Message:    "user.listed",
+	})
+}
+
+func (h *Handler) Details(c *gin.Context) {
+	var input detailsInput
+	if err := c.ShouldBindUri(&input); err != nil {
+		c.Error(err)
+		return
+	}
+
+	user, err := h.service.Details(c.Request.Context(), input.ID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Data:    user,
+		Message: "user.details",
 	})
 }

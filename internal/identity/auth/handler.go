@@ -3,6 +3,7 @@ package auth
 import (
 	"net/http"
 
+	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/shared/dtos"
 	"github.com/gin-gonic/gin"
 )
 
@@ -53,7 +54,10 @@ func (h *Handler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, tokens)
+	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Data:    tokens,
+		Message: "auth.login_success",
+	})
 }
 
 func (h *Handler) Refresh(c *gin.Context) {
@@ -70,5 +74,8 @@ func (h *Handler) Refresh(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, tokens)
+	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Data:    tokens,
+		Message: "auth.refresh_success",
+	})
 }

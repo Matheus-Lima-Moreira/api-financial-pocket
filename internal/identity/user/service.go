@@ -44,3 +44,11 @@ func (s *Service) List(ctx context.Context, page int) ([]UserEntity, *dtos.Pagin
 	}
 	return users, pagination, nil
 }
+
+func (s *Service) Details(ctx context.Context, id uint) (*UserEntity, *shared_errors.AppError) {
+	user, err := s.userRepository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
