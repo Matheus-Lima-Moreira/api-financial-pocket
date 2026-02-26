@@ -55,9 +55,8 @@ func NewRouter(dep Dependencies) *gin.Engine {
 }
 
 type Handlers struct {
-	AuthHandler  *auth.Handler
-	UserHandler  *user.Handler
-	TokenHandler *token.Handler
+	AuthHandler *auth.Handler
+	UserHandler *user.Handler
 }
 
 func setupHandlers(dep Dependencies, jwtManager *auth.JWTManager) *Handlers {
@@ -74,23 +73,20 @@ func setupHandlers(dep Dependencies, jwtManager *auth.JWTManager) *Handlers {
 	userHandler := user.NewHandler(userService)
 
 	tokenRepository := token.NewGormRepository(dep.DB)
-	tokenService := token.NewService(tokenRepository, emailSender, userRepository, dep.Config.VerifyEmailBaseURL)
-	tokenHandler := token.NewHandler(tokenService)
+	tokenService := token.NewService(tokenRepository)
 
-	authService := auth.NewService(userRepository, jwtManager, tokenService)
+	authService := auth.NewService(userRepository, jwtManager, tokenService, emailSender, dep.Config.FrontendBaseURL)
 	authHandler := auth.NewHandler(authService)
 
 	return &Handlers{
-		AuthHandler:  authHandler,
-		UserHandler:  userHandler,
-		TokenHandler: tokenHandler,
+		AuthHandler: authHandler,
+		UserHandler: userHandler,
 	}
 }
 
 func setupRoutes(public, private *gin.RouterGroup, handlers *Handlers) {
 	auth.RegisterRoutes(public, private, handlers.AuthHandler)
 	user.RegisterRoutes(public, private, handlers.UserHandler)
-	token.RegisterRoutes(public, private, handlers.TokenHandler)
 
 	public.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "OK"})

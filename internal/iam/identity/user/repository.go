@@ -13,4 +13,5 @@ type Repository interface {
 	SetEmailVerified(ctx context.Context, id uint, value bool) *shared_errors.AppError
 	List(ctx context.Context, page int) ([]UserEntity, *dtos.PaginationDTO, *shared_errors.AppError)
 	GetById(ctx context.Context, id uint) (*UserEntity, *shared_errors.AppError)
+	UpdatePassword(ctx context.Context, id uint, password string) *shared_errors.AppError
 }

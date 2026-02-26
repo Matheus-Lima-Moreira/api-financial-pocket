@@ -15,24 +15,18 @@ func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
 }
 
-type registerInput struct {
-	Name     string `json:"name" binding:"required,min=3"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
-}
-
 func (h *Handler) Register(c *gin.Context) {
-	var input registerInput
+	var request RegisterRequestDTO
 
-	if err := c.ShouldBindJSON(&input); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.Error(err)
 		return
 	}
 
-	if err := h.service.Register(c.Request.Context(), RegisterInput{
-		Name:     input.Name,
-		Email:    input.Email,
-		Password: input.Password,
+	if err := h.service.Register(c.Request.Context(), RegisterInputDTO{
+		Name:     request.Name,
+		Email:    request.Email,
+		Password: request.Password,
 	},
 	); err != nil {
 		c.Error(err)
@@ -45,20 +39,15 @@ func (h *Handler) Register(c *gin.Context) {
 	})
 }
 
-type loginInput struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
-}
-
 func (h *Handler) Login(c *gin.Context) {
-	var input loginInput
+	var request LoginRequestDTO
 
-	if err := c.ShouldBindJSON(&input); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.Error(err)
 		return
 	}
 
-	tokens, err := h.service.Login(c.Request.Context(), input.Email, input.Password)
+	tokens, err := h.service.Login(c.Request.Context(), request.Email, request.Password)
 	if err != nil {
 		c.Error(err)
 		return
@@ -70,19 +59,15 @@ func (h *Handler) Login(c *gin.Context) {
 	})
 }
 
-type refreshInput struct {
-	RefreshToken string `json:"refresh_token" binding:"required"`
-}
-
 func (h *Handler) Refresh(c *gin.Context) {
-	var input refreshInput
+	var request RefreshRequestDTO
 
-	if err := c.ShouldBindJSON(&input); err != nil {
+	if err := c.ShouldBindJSON(&request); err != nil {
 		c.Error(err)
 		return
 	}
 
-	tokens, err := h.service.RefreshToken(c.Request.Context(), input.RefreshToken)
+	tokens, err := h.service.RefreshToken(c.Request.Context(), request.RefreshToken)
 	if err != nil {
 		c.Error(err)
 		return
@@ -91,5 +76,81 @@ func (h *Handler) Refresh(c *gin.Context) {
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
 		Data:    tokens,
 		Message: "auth.refresh_success",
+	})
+}
+
+func (h *Handler) ResetPassword(c *gin.Context) {
+	var request ResetPasswordRequestDTO
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.Error(err)
+		return
+	}
+
+	if err := h.service.ResetPassword(c.Request.Context(), request.Token, request.NewPassword); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Message: "auth.reset_password_success",
+		Data:    nil,
+	})
+}
+
+func (h *Handler) ResendVerificationEmail(c *gin.Context) {
+	var request ResendVerificationEmailRequestDTO
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.Error(err)
+		return
+	}
+
+	if err := h.service.SendVerificationEmail(c.Request.Context(), request.Email); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, dtos.ReplyDTO{
+		Message: "auth.resend_verification_email_success",
+		Data:    nil,
+	})
+}
+
+func (h *Handler) SendResetPasswordEmail(c *gin.Context) {
+	var request SendResetPasswordEmailRequestDTO
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.Error(err)
+		return
+	}
+
+	if err := h.service.SendResetPasswordEmail(c.Request.Context(), request.Email); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, dtos.ReplyDTO{
+		Message: "auth.reset_password_email_sent_success",
+		Data:    nil,
+	})
+}
+
+func (h *Handler) VerifyEmail(c *gin.Context) {
+	var request VerifyEmailRequestDTO
+
+	if err := c.ShouldBindQuery(&request); err != nil {
+		c.Error(err)
+		return
+	}
+
+	if err := h.service.VerifyEmail(c.Request.Context(), request.Token); err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Message: "auth.verify_email_success",
+		Data:    nil,
 	})
 }

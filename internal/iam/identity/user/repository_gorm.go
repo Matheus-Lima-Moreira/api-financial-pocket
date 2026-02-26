@@ -149,3 +149,16 @@ func (r *GormRepository) GetById(ctx context.Context, id uint) (*UserEntity, *sh
 
 	return toDomain(&model), nil
 }
+
+func (r *GormRepository) UpdatePassword(ctx context.Context, id uint, password string) *shared_errors.AppError {
+	err := r.db.WithContext(ctx).
+		Model(&UserSchema{}).
+		Where("id = ?", id).
+		Update("password", password).Error
+
+	if err != nil {
+		return shared_errors.NewBadRequest(err.Error())
+	}
+
+	return nil
+}

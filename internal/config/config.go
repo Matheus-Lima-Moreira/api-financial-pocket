@@ -23,7 +23,7 @@ type Config struct {
 	SMTPUser           string
 	SMTPPassword       string
 	SMTPFrom           string
-	VerifyEmailBaseURL string
+	FrontendBaseURL    string
 }
 
 func Load() *Config {
@@ -94,9 +94,9 @@ func Load() *Config {
 		smtpFrom = "noreply@financial-pocket.dev"
 	}
 
-	verifyEmailBaseURL := os.Getenv("VERIFY_EMAIL_BASE_URL")
-	if verifyEmailBaseURL == "" {
-		verifyEmailBaseURL = "http://localhost:8090/auth/verify-email"
+	frontendBaseURL := os.Getenv("FRONTEND_BASE_URL")
+	if frontendBaseURL == "" {
+		frontendBaseURL = "http://localhost:8090"
 	}
 
 	return &Config{
@@ -114,7 +114,7 @@ func Load() *Config {
 		SMTPUser:           smtpUser,
 		SMTPPassword:       smtpPassword,
 		SMTPFrom:           smtpFrom,
-		VerifyEmailBaseURL: verifyEmailBaseURL,
+		FrontendBaseURL:    frontendBaseURL,
 	}
 }
 
