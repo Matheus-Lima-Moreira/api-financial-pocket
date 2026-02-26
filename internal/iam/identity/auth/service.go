@@ -141,7 +141,16 @@ func (s *Service) ResetPassword(ctx context.Context, resetPasswordToken string, 
 		return shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
-	if err := s.userRepository.UpdatePassword(ctx, uint(parsedID), newPassword); err != nil {
+	hash, errHash := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if errHash != nil {
+		return shared_errors.NewBadRequest(errHash.Error())
+	}
+
+	if err := s.userRepository.UpdatePassword(ctx, uint(parsedID), string(hash)); err != nil {
+		return err
+	}
+
+	if err := s.tokenService.UpdateStatus(ctx, resetPasswordToken, token.TokenStatusUsed); err != nil {
 		return err
 	}
 
