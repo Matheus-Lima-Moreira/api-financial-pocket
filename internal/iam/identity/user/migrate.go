@@ -3,5 +3,13 @@ package user
 import "gorm.io/gorm"
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&UserSchema{})
+	if err := db.AutoMigrate(&UserSchema{}); err != nil {
+		return err
+	}
+
+	if err := db.AutoMigrate(&UserGroupPermissionSchema{}); err != nil {
+		return err
+	}
+
+	return nil
 }

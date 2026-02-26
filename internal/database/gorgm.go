@@ -6,6 +6,8 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
+	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/authorization/action"
+	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/authorization/group_permission"
 	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/identity/user"
 	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/provisioning/token"
 )
@@ -42,6 +44,14 @@ func RunMigrations(db *gorm.DB) error {
 		return err
 	}
 
+	if err := group_permission.Migrate(db); err != nil {
+		return err
+	}
+
+	if err := action.Migrate(db); err != nil {
+		return err
+	}
+
 	if err := token.Migrate(db); err != nil {
 		return err
 	}
@@ -51,6 +61,14 @@ func RunMigrations(db *gorm.DB) error {
 
 func RunSeeds(db *gorm.DB) error {
 	if err := user.Seed(db); err != nil {
+		return err
+	}
+
+	if err := group_permission.Seed(db); err != nil {
+		return err
+	}
+
+	if err := action.Seed(db); err != nil {
 		return err
 	}
 
