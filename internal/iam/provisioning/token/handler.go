@@ -56,7 +56,7 @@ func (h *Handler) ResetPassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dtos.ReplyDTO{
-		Message: "token.reset_password_success",
+		Message: "token.reset_password_email_sent_success",
 		Data:    nil,
 	})
 }
@@ -79,7 +79,7 @@ func (h *Handler) VerifyEmail(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
-		Message: "auth.verify_email_success",
+		Message: "token.verify_email_success",
 		Data:    nil,
 	})
 }

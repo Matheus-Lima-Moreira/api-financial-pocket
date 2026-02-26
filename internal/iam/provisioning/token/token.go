@@ -1,7 +1,19 @@
 package token
 
-import "encoding/base64"
+import (
+	"crypto/rand"
+	"encoding/base64"
 
-func generateToken() string {
-	return base64.StdEncoding.EncodeToString(make([]byte, 32))
+	shared_errors "github.com/Matheus-Lima-Moreira/financial-pocket/internal/shared/errors"
+)
+
+func GenerateToken() (string, *shared_errors.AppError) {
+	b := make([]byte, 32)
+
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", shared_errors.NewBadRequest(err.Error())
+	}
+
+	return base64.RawURLEncoding.EncodeToString(b), nil
 }

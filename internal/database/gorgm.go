@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/identity/user"
+	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/provisioning/token"
 )
 
 func NewMySQL(dsn string) (*gorm.DB, error) {
@@ -38,6 +39,10 @@ func NewMySQL(dsn string) (*gorm.DB, error) {
 
 func RunMigrations(db *gorm.DB) error {
 	if err := user.Migrate(db); err != nil {
+		return err
+	}
+
+	if err := token.Migrate(db); err != nil {
 		return err
 	}
 

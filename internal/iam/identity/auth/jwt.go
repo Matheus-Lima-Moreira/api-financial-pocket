@@ -68,12 +68,12 @@ func (j *JWTManager) ValidateRefreshToken(tokenString string) (string, *shared_e
 
 	tokenType, ok := claims["type"].(string)
 	if !ok || tokenType != "refresh" {
-		return "", shared_errors.NewUnauthorized("invalid token")
+		return "", shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
 	userID, ok := claims["user_id"].(string)
 	if !ok {
-		return "", shared_errors.NewUnauthorized("invalid token")
+		return "", shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
 	return userID, nil
@@ -82,25 +82,25 @@ func (j *JWTManager) ValidateRefreshToken(tokenString string) (string, *shared_e
 func (j *JWTManager) parseToken(tokenString string, secret string) (jwt.MapClaims, *shared_errors.AppError) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, shared_errors.NewUnauthorized("invalid token")
+			return nil, shared_errors.NewUnauthorized("error.invalid_token")
 		}
 		return []byte(secret), nil
 	})
 
 	if err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, shared_errors.NewUnauthorized("expired token")
+			return nil, shared_errors.NewUnauthorized("error.expired_token")
 		}
-		return nil, shared_errors.NewUnauthorized("invalid token")
+		return nil, shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
 	if !token.Valid {
-		return nil, shared_errors.NewUnauthorized("invalid token")
+		return nil, shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return nil, shared_errors.NewUnauthorized("invalid token")
+		return nil, shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
 	return claims, nil

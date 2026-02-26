@@ -40,7 +40,7 @@ func (r *GormRepository) Create(ctx context.Context, user *UserEntity) *shared_e
 
 	if err := r.db.WithContext(ctx).Create(&model).Error; err != nil {
 		if isDuplicateKeyError(err) {
-			return shared_errors.NewConflict("email já está em uso", "email")
+			return shared_errors.NewConflict("error.email_already_in_use", "email")
 		}
 		return shared_errors.NewBadRequest(err.Error())
 	}

@@ -54,7 +54,7 @@ func (s *Service) Register(ctx context.Context, input RegisterInput) *shared_err
 	}
 
 	if existingUser != nil {
-		return shared_errors.NewConflict("email already in use", "email")
+		return shared_errors.NewConflict("error.email_already_in_use", "email")
 	}
 
 	if err := s.userRepository.Create(ctx, user); err != nil {

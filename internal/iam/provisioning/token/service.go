@@ -34,7 +34,12 @@ func (s *Service) SendVerificationEmail(ctx context.Context, email string) *shar
 		return err
 	}
 
-	tokenEntity := NewTokenEntity(TokenResourceVerifyEmail, strconv.Itoa(int(user.ID)), map[string]any{
+	token, err := GenerateToken()
+	if err != nil {
+		return shared_errors.NewBadRequest(err.Error())
+	}
+
+	tokenEntity := NewTokenEntity(TokenResourceVerifyEmail, token, strconv.Itoa(int(user.ID)), map[string]any{
 		"email": email,
 		"name":  user.Name,
 	})
@@ -46,7 +51,7 @@ func (s *Service) SendVerificationEmail(ctx context.Context, email string) *shar
 	verifyURL := s.verifyBaseURL + "?token=" + url.QueryEscape(tokenEntity.Token)
 
 	if err := s.emailSender.SendVerifyEmail(ctx, email, user.Name, verifyURL); err != nil {
-		return shared_errors.NewBadRequest("auth.verify_email_send_failed")
+		return shared_errors.NewBadRequest("token.verify_email_send_failed")
 	}
 
 	return nil
@@ -58,7 +63,12 @@ func (s *Service) ResetPassword(ctx context.Context, email string) *shared_error
 		return err
 	}
 
-	tokenEntity := NewTokenEntity(TokenResourceResetPassword, strconv.Itoa(int(user.ID)), map[string]any{
+	token, err := GenerateToken()
+	if err != nil {
+		return shared_errors.NewBadRequest(err.Error())
+	}
+
+	tokenEntity := NewTokenEntity(TokenResourceResetPassword, token, strconv.Itoa(int(user.ID)), map[string]any{
 		"email": email,
 		"name":  user.Name,
 	})
@@ -69,7 +79,7 @@ func (s *Service) ResetPassword(ctx context.Context, email string) *shared_error
 
 	resetPasswordURL := s.verifyBaseURL + "?token=" + url.QueryEscape(tokenEntity.Token)
 	if err := s.emailSender.SendResetPasswordEmail(ctx, email, user.Name, resetPasswordURL); err != nil {
-		return shared_errors.NewBadRequest("auth.reset_password_send_failed")
+		return shared_errors.NewBadRequest("token.reset_password_send_failed")
 	}
 
 	return nil
@@ -82,15 +92,15 @@ func (s *Service) VerifyEmail(ctx context.Context, verifyToken string) *shared_e
 	}
 
 	if tokenEntity.Resource != TokenResourceVerifyEmail {
-		return shared_errors.NewUnauthorized("invalid token")
+		return shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
 	if tokenEntity.Status != TokenStatusActive {
-		return shared_errors.NewUnauthorized("invalid token")
+		return shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
 	if tokenEntity.ExpiresAt.Before(time.Now()) {
-		return shared_errors.NewUnauthorized("expired token")
+		return shared_errors.NewUnauthorized("error.expired_token")
 	}
 
 	if err := s.tokenRepository.UpdateStatus(ctx, verifyToken, TokenStatusUsed); err != nil {
@@ -99,7 +109,7 @@ func (s *Service) VerifyEmail(ctx context.Context, verifyToken string) *shared_e
 
 	parsedID, parseErr := strconv.Atoi(tokenEntity.ReferenceID)
 	if parseErr != nil {
-		return shared_errors.NewUnauthorized("invalid token")
+		return shared_errors.NewUnauthorized("error.invalid_token")
 	}
 
 	if err := s.userRepository.SetEmailVerified(ctx, uint(parsedID), true); err != nil {

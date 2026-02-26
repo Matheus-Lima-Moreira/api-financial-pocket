@@ -3,19 +3,20 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
+	"gorm.io/gorm"
 
 	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/config"
 	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/identity/auth"
 	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/identity/user"
+	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/provisioning/token"
 	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/middlewares"
+	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/notifications/emails"
 )
 
 type Dependencies struct {
-	Logger      zerolog.Logger
-	Config      *config.Config
-	JWTManager  *auth.JWTManager
-	AuthHandler *auth.Handler
-	UserHandler *user.Handler
+	Logger zerolog.Logger
+	Config *config.Config
+	DB     *gorm.DB
 }
 
 func NewRouter(dep Dependencies) *gin.Engine {
@@ -41,16 +42,57 @@ func NewRouter(dep Dependencies) *gin.Engine {
 	public := router.Group("")
 	private := router.Group("")
 
+	jwtManager := auth.NewJWTManager(dep.Config.AccessTokenSecret, dep.Config.RefreshTokenSecret)
+
 	// Middlewares
-	private.Use(auth.AuthMiddleware(dep.JWTManager))
+	private.Use(auth.AuthMiddleware(jwtManager))
 
 	// Routes
-	auth.RegisterRoutes(public, private, dep.AuthHandler)
-	user.RegisterRoutes(public, private, dep.UserHandler)
+	handlers := setupHandlers(dep, jwtManager)
+	setupRoutes(public, private, handlers)
+
+	return router
+}
+
+type Handlers struct {
+	AuthHandler  *auth.Handler
+	UserHandler  *user.Handler
+	TokenHandler *token.Handler
+}
+
+func setupHandlers(dep Dependencies, jwtManager *auth.JWTManager) *Handlers {
+	emailSender := emails.NewSMTPEmailSender(
+		dep.Config.SMTPHost,
+		dep.Config.SMTPPort,
+		dep.Config.SMTPUser,
+		dep.Config.SMTPPassword,
+		dep.Config.SMTPFrom,
+	)
+
+	userRepository := user.NewGormRepository(dep.DB)
+	userService := user.NewService(userRepository)
+	userHandler := user.NewHandler(userService)
+
+	tokenRepository := token.NewGormRepository(dep.DB)
+	tokenService := token.NewService(tokenRepository, emailSender, userRepository, dep.Config.VerifyEmailBaseURL)
+	tokenHandler := token.NewHandler(tokenService)
+
+	authService := auth.NewService(userRepository, jwtManager, tokenService)
+	authHandler := auth.NewHandler(authService)
+
+	return &Handlers{
+		AuthHandler:  authHandler,
+		UserHandler:  userHandler,
+		TokenHandler: tokenHandler,
+	}
+}
+
+func setupRoutes(public, private *gin.RouterGroup, handlers *Handlers) {
+	auth.RegisterRoutes(public, private, handlers.AuthHandler)
+	user.RegisterRoutes(public, private, handlers.UserHandler)
+	token.RegisterRoutes(public, private, handlers.TokenHandler)
 
 	public.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "OK"})
 	})
-
-	return router
 }

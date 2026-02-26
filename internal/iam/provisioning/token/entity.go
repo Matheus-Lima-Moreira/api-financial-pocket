@@ -30,11 +30,11 @@ type TokenEntity struct {
 	UpdatedAt   time.Time      `json:"updated_at"`
 }
 
-func NewTokenEntity(resource TokenResource, referenceID string, metadata map[string]any) *TokenEntity {
+func NewTokenEntity(resource TokenResource, token string, referenceID string, metadata map[string]any) *TokenEntity {
 	return &TokenEntity{
 		ReferenceID: referenceID,
 		Resource:    resource,
-		Token:       generateToken(),
+		Token:       token,
 		ExpiresAt:   time.Now().Add(time.Hour * 24),
 		Status:      TokenStatusActive,
 		Metadata:    metadata,

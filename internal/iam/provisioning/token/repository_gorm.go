@@ -28,7 +28,7 @@ func (r *GormRepository) Create(ctx context.Context, token *TokenEntity) *shared
 
 	if err := r.db.WithContext(ctx).Create(&model).Error; err != nil {
 		if isTokenAlreadyExistsError(err) {
-			return shared_errors.NewConflict("token already exists", "token")
+			return shared_errors.NewConflict("error.token_already_exists", "token")
 		}
 		return shared_errors.NewBadRequest(err.Error())
 	}

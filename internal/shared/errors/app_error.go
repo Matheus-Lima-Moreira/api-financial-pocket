@@ -78,11 +78,11 @@ func NewConflict(message string, field ...string) *AppError {
 func NewUnauthorized(message string) *AppError {
 	errorCode := CodeUnauthorized
 	switch message {
-	case "missing token":
+	case "error.missing_token":
 		errorCode = CodeMissingToken
-	case "invalid token":
+	case "error.invalid_token":
 		errorCode = CodeInvalidToken
-	case "expired token":
+	case "error.expired_token":
 		errorCode = CodeExpiredToken
 	}
 

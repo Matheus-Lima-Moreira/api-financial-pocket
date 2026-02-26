@@ -33,7 +33,7 @@ func AuthMiddleware(jwtManager *JWTManager) gin.HandlerFunc {
 
 		tokenType, ok := claims["type"].(string)
 		if !ok || tokenType != "access" {
-			errorDetail := shared_errors.NewUnauthorized("invalid token").ToErrorDetail()
+			errorDetail := shared_errors.NewUnauthorized("error.invalid_token").ToErrorDetail()
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"errors": []shared_errors.ErrorDetail{errorDetail},
 			})
