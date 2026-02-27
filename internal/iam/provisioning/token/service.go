@@ -2,7 +2,6 @@ package token
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	shared_errors "github.com/Matheus-Lima-Moreira/financial-pocket/internal/shared/errors"
@@ -18,13 +17,13 @@ func NewService(tokenRepository Repository) *Service {
 	}
 }
 
-func (s *Service) GenerateToken(ctx context.Context, resource TokenResource, referenceID uint, metadata map[string]any) (*TokenEntity, *shared_errors.AppError) {
+func (s *Service) GenerateToken(ctx context.Context, resource TokenResource, referenceID string, metadata map[string]any) (*TokenEntity, *shared_errors.AppError) {
 	token, err := GenerateToken()
 	if err != nil {
 		return nil, err
 	}
 
-	tokenEntity := NewTokenEntity(resource, token, strconv.Itoa(int(referenceID)), metadata)
+	tokenEntity := NewTokenEntity(resource, token, referenceID, metadata)
 
 	if err := s.tokenRepository.Create(ctx, tokenEntity); err != nil {
 		return nil, err

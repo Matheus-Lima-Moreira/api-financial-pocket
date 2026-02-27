@@ -15,30 +15,22 @@ func NewHandler(service *Service) *Handler {
 	return &Handler{service: service}
 }
 
-type listInput struct {
-	Page int `form:"page" binding:"required,min=1"`
-}
-
-type detailsInput struct {
-	ID uint `uri:"id" binding:"required,min=1"`
-}
-
 func (h *Handler) List(c *gin.Context) {
-	var input listInput
-	if err := c.ShouldBindQuery(&input); err != nil {
+	var request ListRequest
+	if err := c.ShouldBindQuery(&request); err != nil {
 		c.Error(err)
 		return
 	}
 
-	users, pagination, err := h.service.List(c.Request.Context(), input.Page)
+	actions, pagination, err := h.service.List(c.Request.Context(), request.Page)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
-		Data:       users,
+		Data:       actions,
 		Pagination: pagination,
-		Message:    "user.listed",
+		Message:    "action.listed",
 	})
 }

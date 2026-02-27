@@ -80,14 +80,12 @@ func (s *Service) Login(ctx context.Context, email, password string) (*TokenPair
 		return nil, shared_errors.NewUnauthorized("invalid credentials")
 	}
 
-	userID := strconv.Itoa(int(user.ID))
-
-	accessToken, err := s.jwt.GenerateAccessToken(userID)
+	accessToken, err := s.jwt.GenerateAccessToken(user.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := s.jwt.GenerateRefreshToken(userID)
+	refreshToken, err := s.jwt.GenerateRefreshToken(user.ID)
 	if err != nil {
 		return nil, err
 	}

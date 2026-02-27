@@ -4,16 +4,19 @@ import (
 	"time"
 
 	"github.com/Matheus-Lima-Moreira/financial-pocket/internal/iam/authorization/action"
+	organization "github.com/Matheus-Lima-Moreira/financial-pocket/internal/organizations"
 )
 
 type GroupPermissionSchema struct {
-	ID        uint                `gorm:"primaryKey"`
-	Name      string              `gorm:"not null;size:255"`
-	Type      GroupPermissionType `gorm:"not null;size:255"`
-	CreatedAt time.Time           `gorm:"autoCreateTime"`
-	UpdatedAt time.Time           `gorm:"autoUpdateTime"`
+	ID             string              `gorm:"primaryKey"`
+	Name           string              `gorm:"not null;size:255"`
+	Type           GroupPermissionType `gorm:"not null;size:255"`
+	OrganizationID string
+	CreatedAt      time.Time `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time `gorm:"autoUpdateTime"`
 
-	GroupPermissionActions []GroupPermissionActionSchema `gorm:"foreignKey:GroupPermissionID"`
+	GroupPermissionActions []GroupPermissionActionSchema   `gorm:"foreignKey:GroupPermissionID"`
+	Organization           organization.OrganizationSchema `gorm:"foreignKey:OrganizationID"`
 }
 
 func (GroupPermissionSchema) TableName() string {
@@ -21,11 +24,8 @@ func (GroupPermissionSchema) TableName() string {
 }
 
 type GroupPermissionActionSchema struct {
-	ID                uint      `gorm:"primaryKey"`
-	GroupPermissionID uint      `gorm:"not null"`
-	ActionID          uint      `gorm:"not null"`
-	CreatedAt         time.Time `gorm:"autoCreateTime"`
-	UpdatedAt         time.Time `gorm:"autoUpdateTime"`
+	GroupPermissionID string `gorm:"not null"`
+	ActionID          string `gorm:"not null"`
 
 	GroupPermission GroupPermissionSchema `gorm:"foreignKey:GroupPermissionID"`
 	Action          action.ActionSchema   `gorm:"foreignKey:ActionID"`

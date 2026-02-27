@@ -24,6 +24,8 @@ var en = []*goi18n.Message{
 	{ID: "error.missing_token", Other: "Missing token"},
 	{ID: "error.invalid_token", Other: "Invalid token"},
 	{ID: "error.expired_token", Other: "Expired token"},
+	{ID: "action.listed", Other: "Actions listed successfully"},
+	{ID: "group_permission.listed", Other: "Group permissions listed successfully"},
 }
 
 func GetENMessages() []*goi18n.Message {

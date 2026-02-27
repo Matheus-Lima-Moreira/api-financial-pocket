@@ -1,4 +1,4 @@
-package group_permission
+package organizations
 
 import (
 	"net/http"
@@ -22,16 +22,16 @@ func (h *Handler) List(c *gin.Context) {
 		return
 	}
 
-	groupPermissions, pagination, err := h.service.List(c.Request.Context(), request.Page)
+	organizations, pagination, err := h.service.List(c.Request.Context(), request.Page)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
-		Data:       groupPermissions,
+		Data:       organizations,
 		Pagination: pagination,
-		Message:    "group_permission.listed",
+		Message:    "organization.listed",
 	})
 }
 
@@ -42,15 +42,15 @@ func (h *Handler) Details(c *gin.Context) {
 		return
 	}
 
-	groupPermission, err := h.service.Details(c.Request.Context(), request.ID)
+	organization, err := h.service.Details(c.Request.Context(), request.ID)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
-		Data:    groupPermission,
-		Message: "group_permission.details",
+		Data:    organization,
+		Message: "organization.details",
 	})
 }
 
@@ -61,14 +61,14 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
-	err := h.service.Create(c.Request.Context(), &request.GroupPermission)
+	err := h.service.Create(c.Request.Context(), &request.Organization)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusCreated, dtos.ReplyDTO{
-		Message: "group_permission.created",
+		Message: "organization.created",
 	})
 }
 
@@ -79,31 +79,20 @@ func (h *Handler) Update(c *gin.Context) {
 		return
 	}
 
-	err := h.service.Update(c.Request.Context(), &request.GroupPermission)
+	err := h.service.Update(c.Request.Context(), &request.Organization)
 	if err != nil {
 		c.Error(err)
 		return
 	}
-
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
-		Message: "group_permission.updated",
+		Message: "organization.updated",
 	})
 }
 
 func (h *Handler) Delete(c *gin.Context) {
-	var request DeleteRequest
-	if err := c.ShouldBindUri(&request); err != nil {
+	var input DeleteRequest
+	if err := c.ShouldBindUri(&input); err != nil {
 		c.Error(err)
 		return
 	}
-
-	err := h.service.Delete(c.Request.Context(), request.ID)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	c.JSON(http.StatusOK, dtos.ReplyDTO{
-		Message: "group_permission.deleted",
-	})
 }

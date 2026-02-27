@@ -24,6 +24,8 @@ var ptBR = []*goi18n.Message{
 	{ID: "error.missing_token", Other: "Token ausente"},
 	{ID: "error.invalid_token", Other: "Token inválido"},
 	{ID: "error.expired_token", Other: "Token expirado"},
+	{ID: "action.listed", Other: "Ações listadas com sucesso"},
+	{ID: "group_permission.listed", Other: "Permissões de grupo listadas com sucesso"},
 }
 
 func GetPTBRMessages() []*goi18n.Message {

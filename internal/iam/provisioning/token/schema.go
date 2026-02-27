@@ -7,7 +7,7 @@ import (
 )
 
 type TokenSchema struct {
-	ID          uint              `gorm:"primaryKey"`
+	ID          string            `gorm:"primaryKey"`
 	Token       string            `gorm:"uniqueIndex;not null;size:255"`
 	ReferenceID string            `gorm:"not null;size:255"`
 	Resource    TokenResource     `gorm:"not null"`

@@ -19,7 +19,7 @@ const (
 )
 
 type TokenEntity struct {
-	ID          uint           `json:"id"`
+	ID          string         `json:"id"`
 	ReferenceID string         `json:"reference_id"`
 	Token       string         `json:"token"`
 	Resource    TokenResource  `json:"resource"`
