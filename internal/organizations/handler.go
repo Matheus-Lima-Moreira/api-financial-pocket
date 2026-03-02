@@ -29,6 +29,7 @@ func (h *Handler) List(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:       dtos.SUCCESS,
 		Data:       organizations,
 		Pagination: pagination,
 		Message:    "organization.listed",
@@ -49,6 +50,7 @@ func (h *Handler) Details(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Data:    organization,
 		Message: "organization.details",
 	})
@@ -68,6 +70,7 @@ func (h *Handler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "organization.created",
 	})
 }
@@ -85,6 +88,7 @@ func (h *Handler) Update(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "organization.updated",
 	})
 }

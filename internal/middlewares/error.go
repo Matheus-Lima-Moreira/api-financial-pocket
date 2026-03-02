@@ -46,6 +46,7 @@ func ErrorMiddleware() gin.HandlerFunc {
 				},
 			}
 			c.JSON(http.StatusBadRequest, dtos.ReplyDTO{
+				Code:    dtos.INVALID_FIELDS,
 				Errors:  errorDetails,
 				Message: "error.missing_body",
 			})
@@ -58,6 +59,7 @@ func ErrorMiddleware() gin.HandlerFunc {
 			strings.Contains(errMsg, "unmarshal") ||
 			strings.Contains(errMsg, "invalid character") {
 			c.JSON(http.StatusBadRequest, dtos.ReplyDTO{
+				Code:    dtos.INVALID_FIELDS,
 				Message: "error.invalid_json",
 				Errors: []shared_errors.ErrorDetail{
 					{
@@ -83,6 +85,7 @@ func ErrorMiddleware() gin.HandlerFunc {
 			}
 
 			c.JSON(http.StatusBadRequest, dtos.ReplyDTO{
+				Code:    dtos.INVALID_FIELDS,
 				Errors:  errorDetails,
 				Message: "error.validation",
 			})
@@ -94,6 +97,7 @@ func ErrorMiddleware() gin.HandlerFunc {
 			errorDetails = []shared_errors.ErrorDetail{errorDetail}
 
 			c.JSON(appErr.Code, dtos.ReplyDTO{
+				Code:    dtos.INVALID_FIELDS,
 				Errors:  errorDetails,
 				Message: appErr.Message,
 			})
@@ -108,8 +112,9 @@ func ErrorMiddleware() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusInternalServerError, dtos.ReplyDTO{
+			Code:    dtos.INTERNAL_SERVER_ERROR,
 			Errors:  errorDetails,
-		Message: "error.internal",
+			Message: "error.internal",
 		})
 	}
 }

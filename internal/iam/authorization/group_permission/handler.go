@@ -29,6 +29,7 @@ func (h *Handler) List(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:       dtos.SUCCESS,
 		Data:       groupPermissions,
 		Pagination: pagination,
 		Message:    "group_permission.listed",
@@ -49,6 +50,7 @@ func (h *Handler) Details(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Data:    groupPermission,
 		Message: "group_permission.details",
 	})
@@ -68,6 +70,7 @@ func (h *Handler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "group_permission.created",
 	})
 }
@@ -86,6 +89,7 @@ func (h *Handler) Update(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "group_permission.updated",
 	})
 }
@@ -104,6 +108,7 @@ func (h *Handler) Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "group_permission.deleted",
 	})
 }

@@ -43,6 +43,7 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "auth.verify_email_sent",
 		Data:    nil,
 	})
@@ -67,6 +68,7 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Data:    tokens,
 		Message: "auth.login_success",
 	})
@@ -87,6 +89,7 @@ func (h *Handler) Refresh(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Data:    tokens,
 		Message: "auth.refresh_success",
 	})
@@ -106,6 +109,7 @@ func (h *Handler) ResetPassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "auth.reset_password_success",
 		Data:    nil,
 	})
@@ -129,6 +133,7 @@ func (h *Handler) ResendVerificationEmail(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "auth.resend_verification_email_success",
 		Data:    nil,
 	})
@@ -152,6 +157,7 @@ func (h *Handler) SendResetPasswordEmail(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "auth.reset_password_email_sent_success",
 		Data:    nil,
 	})
@@ -171,6 +177,7 @@ func (h *Handler) VerifyEmail(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Message: "auth.verify_email_success",
 		Data:    nil,
 	})
@@ -183,6 +190,7 @@ func (h *Handler) handleRateLimit(c *gin.Context, action AuthRateLimitAction, id
 	}
 
 	c.JSON(http.StatusTooManyRequests, dtos.ReplyDTO{
+		Code:    dtos.SERVICE_UNAVAILABLE,
 		Message: "auth.rate_limited",
 		Data: gin.H{
 			"retry_after_seconds": int(retryAfter.Seconds()),

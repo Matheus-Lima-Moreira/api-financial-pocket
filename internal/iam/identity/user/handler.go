@@ -29,6 +29,7 @@ func (h *Handler) List(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:       dtos.SUCCESS,
 		Data:       users,
 		Pagination: pagination,
 		Message:    "user.listed",
@@ -49,6 +50,7 @@ func (h *Handler) Details(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, dtos.ReplyDTO{
+		Code:    dtos.SUCCESS,
 		Data:    user,
 		Message: "user.details",
 	})
